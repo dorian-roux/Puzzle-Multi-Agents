@@ -9,16 +9,23 @@ import time
 import sys
 
 from color_print import ColorPrint as CP
+import re
 
+
+
+
+
+
+
+
+    
 class Agent(Thread):
     isMoving = Semaphore(1)
-
-    # Position of an agent
     agentDict = {}
-
     nbRow = None
     nbCol = None
 
+    
     def showGrid():        
         print("---------------------------------")
         for row in range(Agent.nbRow + 1):
@@ -38,11 +45,13 @@ class Agent(Thread):
     def __init__(self, currentPosition, target) -> None:
         super().__init__()
         self.running = True
-        # initial position
         self.currentPosition = currentPosition
         self.target = target
         Agent.agentDict[currentPosition] = self
-
+        Agent.initAgentMessages()
+    
+    
+        
     def run(self) -> None:
         time.sleep(1)
         while self.running == True:
@@ -52,10 +61,6 @@ class Agent(Thread):
             self.act()
             self.move()
             time.sleep(0.1)
-
-            if keyboard.is_pressed('esc'):
-                print("Exit")
-                sys.exit()
 
     def communicate(self):
         pass
@@ -71,7 +76,7 @@ class Agent(Thread):
 
     def move(self):
         Agent.isMoving.acquire()       
-        currentDistance = sum(abs(current - target) for current, target in zip(self.currentPosition, self.target))
+        currentDistance = self.distManathan()
         if currentDistance == 0:
             self.running = False
             Agent.isMoving.release()
@@ -86,7 +91,6 @@ class Agent(Thread):
                 if len(goodDirection) != 0:
                     Agent.agentDict.pop(self.currentPosition)
                     newPosition = sorted(goodDirection, key=lambda t: t[1])[0][0]
-                    # print("Agent", self.currentPosition,"moved to", newPosition)
                     self.currentPosition = newPosition
                     Agent.agentDict[self.currentPosition] = self
                     Agent.showGrid()
@@ -94,48 +98,50 @@ class Agent(Thread):
                 else:
                     Agent.isMoving.release()
     
-    def neighborsOccupation(self, currentPosition):
-        possibleDirection = []
-        if (0 <= currentPosition[0] + 1 <= Agent.nbRow) and (0 <= currentPosition[1] <= Agent.nbCol) and ((currentPosition[0] + 1, currentPosition[1]) not in Agent.agentDict):
-            possibleDirection.append((currentPosition[0] + 1, currentPosition[1]))
-        if (0 <= currentPosition[0] - 1 <= Agent.nbRow) and (0 <= currentPosition[1] <= Agent.nbCol) and ((currentPosition[0] - 1, currentPosition[1]) not in Agent.agentDict):
-            possibleDirection.append((currentPosition[0] - 1,  currentPosition[1]))
-        if (0 <= currentPosition[0] <= Agent.nbRow) and (0 <= currentPosition[1] + 1 <= Agent.nbCol) and ((currentPosition[0], currentPosition[1] + 1) not in Agent.agentDict):
-            possibleDirection.append((currentPosition[0], currentPosition[1] + 1))
-        if (0 <= currentPosition[0] <= Agent.nbRow) and (0 <= currentPosition[1] - 1 <= Agent.nbCol) and ((currentPosition[0], currentPosition[1] - 1) not in Agent.agentDict):
-            possibleDirection.append((currentPosition[0], currentPosition[1] - 1))
-        return possibleDirection
-
-
-
-if __name__ == '__main__':
-    Agent.nbRow = 5
-    Agent.nbCol = 5
-    Agent.agendDict = {}
-
-    allPosition = [(r,c) for r in range(Agent.nbRow+1) for c in range(Agent.nbCol+1)]
-    allTarget = allPosition.copy()
-
-    NUMBER_AGENT = 15
-    MAX_AGENT = Agent.nbRow * Agent.nbCol
-    if NUMBER_AGENT > MAX_AGENT:
-        NUMBER_AGENT = MAX_AGENT
+    
+    def initAgentMessages():
+        agentMessages = dict()
+        for agentPosition in Agent.agentDict.keys():
+            agentThread = re.findall(r'Thread-\d+', str(Agent.agentDict[agentPosition]))[0]
+            agentMessages[agentThread]  = dict()
+            for subAgentPosition in Agent.agentDict.keys():  
+                subAgentThread = re.findall(r'Thread-\d+', str(Agent.agentDict[subAgentPosition]))[0]
+                if agentPosition == subAgentPosition:
+                    agentMessages[agentThread][subAgentThread] = dict({'LOG':[]})             
+                    continue
+                agentMessages[agentThread][subAgentThread] = dict({'MESSAGE' : '', 'LOG':[]})             
+        Agent.messages = agentMessages
         
-    for _ in range(NUMBER_AGENT):
-        init = random.choice(allPosition)
-        allPosition.remove(init)
+    
+    def neighborsOccupation(self, currentPosition):
+        cPos_y, cPos_x = currentPosition
+        availableDirection = []
+        if (0 <= cPos_y - 1 <= self.nbRow) and (0 <= cPos_x <= self.nbCol) and ((cPos_y - 1, cPos_x) not in self.agentDict):  # Verify TOP
+            availableDirection.append(((cPos_y - 1), cPos_x))
+        if (0 <= cPos_y + 1 <= self.nbRow) and (0 <= cPos_x <= self.nbCol) and ((cPos_y + 1, cPos_x) not in self.agentDict): # Verify BOTTOM
+            availableDirection.append(((cPos_y + 1), cPos_x))
+        if (0 <= cPos_y <= self.nbRow) and (0 <= (cPos_x + 1) <= self.nbCol) and ((cPos_y, cPos_x + 1) not in self.agentDict): # Verify RIGHT
+            availableDirection.append((cPos_y, (cPos_x + 1)))
+        if (0 <= cPos_y <= self.nbRow) and (0 <= (cPos_x - 1) <= self.nbCol) and ((cPos_y, cPos_x - 1) not in self.agentDict): # Verify LEFT
+            availableDirection.append(((cPos_y), (cPos_x - 1)))
+        return availableDirection
 
-        target = random.choice(allTarget)
-        allTarget.remove(target)
-
-        agent = Agent(init, target)
-
-    AgentList = list(Agent.agentDict.values())
-    InitList = list(Agent.agentDict.keys())
-    for init in InitList:
-        print("Initial State:",init, "Target State:",Agent.agentDict[init].target)
-
-    for agent in AgentList:
-        agent.start()
-
-    Agent.showGrid()
+    
+    def distManathan(self):
+        currentPosition, targetPosition = self.currentPosition, self.target
+        return sum(abs(current - target) for current, target in zip(currentPosition, targetPosition))
+        
+    def getNeighbors(self):
+        currentPosition, targetPosition = self.currentPosition, self.target
+        directNeighboors = []
+        neighboorPositions = dict({
+            'TOP': {'POSITION': (currentPosition[0] - 1, currentPosition[1]), 'DIST_MANATHAN': self.distManathan((currentPosition[0] - 1, currentPosition[1]), targetPosition)},
+            'RIGHT': {'POSITION': (currentPosition[0] + 1, currentPosition[1]), 'DIST_MANATHAN': self.distManathan((currentPosition[0] + 1, currentPosition[1]), targetPosition)},
+            'BOTTOM':{'POSITION': (currentPosition[0], currentPosition[1] - 1), 'DIST_MANATHAN': self.distManathan((currentPosition[0], currentPosition[1] - 1), targetPosition)},
+            'LEFT': {'POSITION': (currentPosition[0], currentPosition[1] + 1), 'DIST_MANATHAN': self.distManathan((currentPosition[0], currentPosition[1] + 1), targetPosition)}
+        })
+        
+        for nPos in neighboorPositions:
+            if neighboorPositions[nPos]['POSITION'] in self.agentDict:
+                directNeighboors.append(neighboorPositions[nPos])
+        return sorted(directNeighboors, key=lambda k: k['DIST_MANATHAN'], reverse=False)

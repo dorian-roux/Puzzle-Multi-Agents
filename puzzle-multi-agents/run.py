@@ -17,7 +17,6 @@ import random
 from agents import Agent
 
 
-
 # - MAIN - 
 
 if __name__ == '__main__':
@@ -29,9 +28,8 @@ if __name__ == '__main__':
     allPosition = [(r,c) for r in range(Agent.nbRow+1) for c in range(Agent.nbCol+1)]
     allTarget = allPosition.copy()
 
-    NUMBER_AGENT = 10
     MAX_AGENT = (Agent.nbRow + 1) * (Agent.nbCol + 1)
-    NUMBER_AGENT = int(MAX_AGENT*0.8)
+    NUMBER_AGENT = int(MAX_AGENT*0.5)
         
     for _ in range(NUMBER_AGENT):
         init = random.choice(allPosition)
@@ -43,7 +41,9 @@ if __name__ == '__main__':
     AgentList = list(Agent.agentDict.values())
     InitList = list(Agent.agentDict.keys())
 
+
     for agent in AgentList:
         agent.start()
-
+    
+    
     Agent.showGrid()
