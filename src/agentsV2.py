@@ -2,7 +2,6 @@ import random
 from threading import Thread
 from threading import Semaphore
 import time
-from draw_grid import drawGrid
 from message import Message
 
 class Agent(Thread):
@@ -22,33 +21,31 @@ class Agent(Thread):
     pathFont = ''
     saveGrid = True
     gridStack = []  
-    count = 1
-    start_time = time.time()
-    update_time = time.time()
-    displayTime = 2     
-    Terminated = False
 
-    def defaultConfig():
-        Agent.isMoving = Semaphore(1)
-        Agent.limitTime = (30*60) # 30 minutes
-        Agent.nbRow = None
-        Agent.nbCol = None
+   
 
-        # Position of an agent
-        Agent.agentDict = {}
-        Agent.prevDict = {}
-        Agent.messageStack = []
 
-        # Stack of GRID
-        Agent.pathFolder = 'tmp'
-        Agent.pathFont = ''
-        Agent.saveGrid = True
-        Agent.gridStack = []  
-        Agent.count = 1
-        Agent.start_time = time.time()
-        Agent.update_time = time.time()
-        Agent.displayTime = 2     
-        Agent.Terminated = False
+    # def defaultConfig():
+    #     Agent.isMoving = Semaphore(1)
+    #     Agent.limitTime = (30*60) # 30 minutes
+    #     Agent.nbRow = None
+    #     Agent.nbCol = None
+
+    #     # Position of an agent
+    #     Agent.agentDict = {}
+    #     Agent.prevDict = {}
+    #     Agent.messageStack = []
+
+    #     # Stack of GRID
+    #     Agent.pathFolder = 'tmp'
+    #     Agent.pathFont = ''
+    #     Agent.saveGrid = False
+    #     Agent.gridStack = []  
+    #     Agent.count = 1
+    #     Agent.start_time = time.time()
+    #     Agent.update_time = time.time()
+    #     Agent.displayTime = 2     
+    #     Agent.Terminated = False
 
     def generateInit(allTarget, numIteration=1000):
         # Generate a random possible initial position grid based on the target coordinates list
@@ -87,26 +84,13 @@ class Agent(Thread):
         self.target = target
         Agent.agentDict[currentPosition] = self
         
+
     def run(self) -> None:
-        while (time.time() - Agent.start_time < Agent.limitTime) and (not Agent.verifyRunning()):
-            Agent.isMoving.acquire()
+        while self.running:
+            self.isMoving.acquire()
             self.move()
             Agent.isMoving.release()
             time.sleep(0.01)
-
-            if Agent.saveGrid:
-                if time.time() - Agent.update_time >= Agent.displayTime:
-                    if Agent.prevDict != Agent.agentDict:
-                        Agent.prevDict = Agent.agentDict.copy()
-                        Agent.gridStack.insert(0, drawGrid(Agent))
-                        Agent.count = Agent.count + 1
-                    Agent.update_time = time.time()
-                    
-        
-        if not Agent.Terminated:
-            Agent.Terminated = True
-            Agent.gridStack.insert(0, drawGrid(Agent))
-            print('Time to Complete: ', time.time() - Agent.start_time)
 
 
     def verifyRunning():
@@ -114,6 +98,7 @@ class Agent(Thread):
             if agent.currentPosition != agent.target:
                 return False
         return True
+
 
     def move(self):
         if len(Agent.messageStack) == 0:
@@ -138,11 +123,6 @@ class Agent(Thread):
                     Agent.agentDict.pop(self.currentPosition)
                     self.currentPosition = closestPos
                     Agent.agentDict[self.currentPosition] = self
-                
-                    # print(closestPos in Agent.agentDict)
-                    # print(self.currentPosition, self.target, closestPos)
-                    # print( Agent.agentDict)
-
                     return
                 else:          
                     # The master send a message to the closest agent on the best path to move
@@ -150,21 +130,16 @@ class Agent(Thread):
                     # print((self.currentPosition, self.target), closestPos, closestPos_path)
                     Agent.messageStack.append(Message(self, Agent.agentDict[closestPos_path[0]], closestPos_path[1]))
                     for i in range(len(closestPos_path[:-2])):
+                        if closestPos_path[i+1] not in Agent.agentDict:
+                            return
                         Agent.messageStack.append(Message(Agent.agentDict[closestPos_path[i]], Agent.agentDict[closestPos_path[i+1]], closestPos_path[i+2]))
-                    return
-                
+                    return         
         else:
             # The thread is not the master 
             if Agent.messageStack[-1].receiver == self:
-                # print(Agent.messageStack[-1].receiver, self, Agent.messageStack[-1].position)
-                # print(Agent.messageStack[-1].position, self.currentPosition)
-                # print('----------------------')
-                # # The thread is the receiver, we change the position of the agent to the new position
                 Agent.agentDict.pop(self.currentPosition)
                 self.currentPosition = Agent.messageStack[-1].position
                 Agent.agentDict[self.currentPosition] = self
-                
-                # We delete the message from the stack
                 Agent.messageStack.pop()
                 return
 
@@ -174,12 +149,12 @@ class Agent(Thread):
             for row in range(0, Agent.nbCol):
                 if (col,row) not in Agent.agentDict:
                     lsVoid.append((col,row))
-        
+
         lsDistance = []
         for void in lsVoid:
-            path_to_void = self.Astar(void)
-            lsDistance.append((len(path_to_void), path_to_void))
-        return random.choice(list(filter(lambda distInf : distInf == min(lsDistance, key=lambda x: x[0]), lsDistance)))[1]
+            lsDistance.append((sum(abs(value1 - value2) for value1, value2 in zip(self.currentPosition, void)), void))
+        bestVoid = random.choice(list(filter(lambda distInf : distInf == min(lsDistance, key=lambda x: x[0]), lsDistance)))[1]
+        return self.Astar(bestVoid)
                 
     def Astar(self, targetPos): # A* algorithm
         dictGHF = dict({self.currentPosition : {'G': 0, 'H':0, 'F':0}})

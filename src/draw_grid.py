@@ -8,8 +8,7 @@ def setupImageGrid(nbRow, nbCol):
     ImDraw.rounded_rectangle((0, 0, ImGrid.width, ImGrid.height), fill="white", outline="black", width=borderSize, radius=15)
     return ImGrid
 
-def drawGrid(Agent):
-    nbRow, nbCol = Agent.nbRow, Agent.nbCol
+def SaveDrawnGrid(nbRow, nbCol, dictAgents, pathFont, pathFolder, count):
     ImGrid = setupImageGrid(nbRow, nbCol)
     borderSize = max(nbRow, nbCol)
 
@@ -20,8 +19,8 @@ def drawGrid(Agent):
     sizeHeight = (ImGrid.height - (2 * limitHeight))
     
     lsAgentsDone = []
-    lsAgentsNumb = sorted(list(map(lambda agentPos : str(re.findall(r'Thread-\d+', str(Agent.agentDict[agentPos]))[0].split('-')[-1]), Agent.agentDict.keys())), reverse=False)
-    dictAgents = {agentNumb : str(agentIndex+1) for agentIndex, agentNumb in enumerate(lsAgentsNumb)}
+    lsAgentsNumb = sorted(list(map(lambda agentPos : str(re.findall(r'Thread-\d+', str(dictAgents[agentPos]))[0].split('-')[-1]), dictAgents.keys())), reverse=False)
+    upAgents = {agentNumb : str(agentIndex+1) for agentIndex, agentNumb in enumerate(lsAgentsNumb)}
     for r in range(0, nbRow+1):    
         for c in range(0, nbCol+1):
             initWidth, initHeight = (limitWidth + (r/nbRow) * sizeWidth), (limitHeight + (c/nbRow) * sizeHeight)
@@ -32,19 +31,19 @@ def drawGrid(Agent):
             minWidth, maxWidth = (limitWidth + (r/nbRow) * sizeWidth), (limitWidth + ((r+1)/nbRow) * sizeWidth)
             minHeight, maxHeight = (limitHeight + (c/nbRow) * sizeHeight), (limitHeight + ((c+1)/nbRow) * sizeHeight)
             middleWidth, middleHeight = minWidth + (maxWidth - minWidth)/2, minHeight + (maxHeight - minHeight)/2 
-            if (r, c) in Agent.agentDict:
-                content = dictAgents[re.findall(r'Thread-\d+', str(Agent.agentDict[(r, c)]))[0].split('-')[-1]]
+            if (r, c) in dictAgents:
+                content = upAgents[re.findall(r'Thread-\d+', str(dictAgents[(r, c)]))[0].split('-')[-1]]
                 if content in lsAgentsDone:
                     continue
                 lsAgentsDone.append(content)
-                fill = "green" if Agent.agentDict[(r, c)].target == (r, c) else "red"
-                font = ImageFont.FreeTypeFont(Agent.pathFont,25)
+                fill = "green" if dictAgents[(r, c)].target == (r, c) else "red"
+                font = ImageFont.FreeTypeFont(pathFont, size=25)
                 textBox = ImDraw.textbbox((0,0), content, font=font)
                 textWidth, textHeight = textBox[2] - textBox[0],  textBox[3]
-                ImDraw.text((middleWidth - textWidth/2, middleHeight - textHeight/2), content, fill=fill, font=ImageFont.FreeTypeFont(Agent.pathFont, 25))   
+                ImDraw.text((middleWidth - textWidth/2, middleHeight - textHeight/2), content, fill=fill, font=ImageFont.FreeTypeFont(pathFont, size=25))   
                 
-                
-    if len(lsAgentsDone) == len(Agent.agentDict):
-       ImGrid.save(f'{Agent.pathFolder}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{Agent.count}.png')
-    return ImGrid
+    # if len(lsAgentsDone) == len(upAgents):
+    ImGrid.save(f'{pathFolder}/PuzzleMA-{nbRow}_{nbCol}-Im_{count}.png')
+    
+    return True
 

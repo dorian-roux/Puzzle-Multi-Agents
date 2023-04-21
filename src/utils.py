@@ -1,7 +1,8 @@
 import os
 import streamlit as st
 import shutil
-
+import random
+import string
 
 
 def constructTMP(tmpPath):
@@ -29,3 +30,9 @@ def streamlitButton(txt_col="rgb(255, 255, 255)", txth_col="rgb(0, 0, 0)", bg_co
             div.stButton > button:first-child:hover {background-color:""" + bgh_color + """;color:""" + txth_col + """;}
         </style>
     """, unsafe_allow_html=True)
+    
+    
+    
+def generateID(length=10):
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for _ in range(length))
