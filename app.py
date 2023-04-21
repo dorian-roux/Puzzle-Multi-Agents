@@ -15,10 +15,10 @@ import time
 import random
 import streamlit as st
 from src.agentsV2 import Agent
+from PIL import ImageFile
 
 # -- Custom Variables and Functions --
 from utils import constructTMP, streamlitButton
-
 
 
 # - FUNCTION -
@@ -35,7 +35,8 @@ def main():
     st.set_page_config(page_title=config_page_title, page_icon=config_page_icon, layout=config_layout)  # Set Page Configuration
     st.markdown("""<style>#MainMenu {visibility: visible;}footer {visibility: hidden;}</style>""", unsafe_allow_html=True) 
     streamlitButton()
-    
+    ImageFile.LOAD_TRUNCATED_IMAGES = True
+
     st.markdown("""
         <div style="text-align:center; margin-top:-50px">
             <h2 style="font-weight:bold; font-size:45px; padding:0px">Puzzle Multi-Agents</h2>
@@ -55,7 +56,8 @@ def main():
         st.session_state['P_IN_PROGRESS'] = False
         st.session_state['RESET_FOLDER'] = False
         st.session_state['FAST_VALIDATE'] = False
-    
+        st.session_state['LIST_IMAGES'] = []
+        
     # -- Setup Variables --
     if not st.session_state['config']:
 
@@ -106,7 +108,6 @@ def main():
 
         MAX_AGENT = ((Agent.nbRow) * (Agent.nbCol)) - 1
         NUMBER_AGENT = int(MAX_AGENT * st.session_state['FILL_PRCT']/100)
-        print(NUMBER_AGENT, MAX_AGENT)
         for _ in range(NUMBER_AGENT):
             init = random.choice(allPosition)
             target = random.choice(allTarget)
@@ -123,11 +124,13 @@ def main():
         st.experimental_rerun()
 
     if not Agent.verifyRunning():
-        maxIm = max(list(map(lambda fileIm : int(fileIm.split('-Im_')[-1].split('.')[0]), os.listdir(Agent.pathFolder))))
-        ImagePath = f'{Agent.pathFolder}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{maxIm}.png'
         try:
+            maxIm = max(list(map(lambda fileIm : int(fileIm.split('-Im_')[-1].split('.')[0]), os.listdir(st.session_state["PATH_FOLDER"]))))
+            ImagePath = f'{st.session_state["PATH_FOLDER"]}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{maxIm}.png'
             _, col1, _ = st.columns([4, 4, 4])
             col1.image(ImagePath, use_column_width=True)
+            st.session_state['INDEX_IMAGE'] = maxIm
+
         except:
             pass
         st.session_state['INDEX_IMAGE'] = maxIm
@@ -137,11 +140,8 @@ def main():
     if not st.session_state['FAST_VALIDATE']:
         time.sleep(1) 
         st.session_state['FAST_VALIDATE'] = True
-        maxIm = max(list(map(lambda fileIm : int(fileIm.split('-Im_')[-1].split('.')[0]), os.listdir(Agent.pathFolder))))
-        ImagePath = f'{st.session_state["PATH_FOLDER"]}/PuzzleMA-{st.session_state["GRID"]["N_ROWS"]}_{st.session_state["GRID"]["N_COLS"]}-Im_{maxIm}.png'
-        st.session_state['INDEX_IMAGE'] = maxIm
-        st.session_state['MAX_IMAGE'] = maxIm
-        st.session_state['MIN_IMAGE'] = 1
+        # maxIm = max(list(map(lambda fileIm : int(fileIm.split('-Im_')[-1].split('.')[0]), os.listdir(st.session_state["PATH_FOLDER"]))))
+        # ImagePath = f'{st.session_state["PATH_FOLDER"]}/PuzzleMA-{st.session_state["GRID"]["N_ROWS"]}_{st.session_state["GRID"]["N_COLS"]}-Im_{maxIm}.png'
         st.experimental_rerun()
     
     
@@ -149,48 +149,25 @@ def main():
     st.write('<hr>', unsafe_allow_html=True)
     st.write('<br>', unsafe_allow_html=True)
     st.subheader('Display the Puzzle Multi-Agents')
-    if (st.session_state['INDEX_IMAGE'] > st.session_state['MIN_IMAGE']) and (st.session_state['INDEX_IMAGE'] < st.session_state['MAX_IMAGE']):
-        _, col1, col2, _ = st.columns([4,2,2,4])
-        previousIm = col1.button('Previous Image')
-        if previousIm:
-            st.session_state['INDEX_IMAGE'] -= 1
-            st.experimental_rerun()
-    
-        nextIm = col2.button('Next Image')
-        if nextIm:
-            st.session_state['INDEX_IMAGE'] += 1
-            st.experimental_rerun()	
-            
-    elif (st.session_state['INDEX_IMAGE'] > st.session_state['MIN_IMAGE']) and (st.session_state['INDEX_IMAGE'] >= st.session_state['MAX_IMAGE']):
-        previousIm = st.button('Previous Image')
-        if previousIm:
-            st.session_state['INDEX_IMAGE'] -= 1
-            st.experimental_rerun()
-    
-    else:
-        nextIm = st.button('Next Image')
-        if nextIm:
-            st.session_state['INDEX_IMAGE'] += 1
-            st.experimental_rerun()	
-    
-    st.write(f'IMAGE INDEX : {st.session_state["INDEX_IMAGE"]} / TOTAL IMAGES : {st.session_state["MAX_IMAGE"]}')
+    _, col1, _ = st.columns([4.5,3,4.5])
+    st.session_state['LIST_IMAGES'] = sorted(list(map(lambda fileIm : int(fileIm.split('-Im_')[-1].split('.')[0]), os.listdir(st.session_state["PATH_FOLDER"]))), reverse=False)
+    st.session_state['INDEX_IMAGE'] = col1.select_slider(label='Find the Image', options=st.session_state['LIST_IMAGES'], value=st.session_state['LIST_IMAGES'][-1])
     ImagePath = f'{st.session_state["PATH_FOLDER"]}/PuzzleMA-{st.session_state["GRID"]["N_ROWS"]}_{st.session_state["GRID"]["N_COLS"]}-Im_{st.session_state["INDEX_IMAGE"]}.png'
     _, col1, _ = st.columns([4, 4, 4])
+    col1.markdown(f"""
+                  <div style="text-align:center">
+                    <h2 style="font-weight:bold">IMAGE {st.session_state['INDEX_IMAGE']}</h2>
+                  </div>
+                  """, unsafe_allow_html=True)
     col1.image(ImagePath, use_column_width=True)
-    # st.session_state['INDEX_IMAGE'] =  
-    # st.slider(label='Select the "Image Index"', label_visibility='visible', min_value=0, max_value=maxIm, value=0, step=1)
-    # maxIm = max(list(map(lambda fileIm : int(fileIm.split('-Im_')[-1].split('.')[0]), os.listdir(Agent.pathFolder))))
-    # ImagePath = f'{Agent.pathFolder}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{maxIm}.png'
-    # st.write(ImagePath)
-    # try:
-    #     st.image(ImagePath)
-    # except:
-    #     st.write(maxIm)
-        
+  
+  
     if st.button('reconfigure'):
         st.session_state['config'] = False
         st.session_state['P_IN_PROGRESS'] = False
         st.session_state['RESET_FOLDER'] = False
+        Agent.defaultConfig()
+
         st.experimental_rerun()
         
         

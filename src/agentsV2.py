@@ -6,9 +6,9 @@ from draw_grid import drawGrid
 from message import Message
 
 class Agent(Thread):
+    
     isMoving = Semaphore(1)
-
-    limitTime = (30*60) # 30 minutes
+    imitTime = (30*60) # 30 minutes
     nbRow = None
     nbCol = None
 
@@ -25,30 +25,31 @@ class Agent(Thread):
     count = 1
     start_time = time.time()
     update_time = time.time()
-    displayTime = 2
-    
-    Terminated = False
-   
-    # def showGrid():   
-    #     for row in range(Agent.nbRow + 1):
-    #         for col in range(Agent.nbCol + 1):
-    #             dot = '.' * len(str(len(Agent.agentDict)))
-    #             if (row, col) in Agent.agentDict:
-    #                 agentThread = re.findall(r'Thread-\d+', str(Agent.agentDict[(row, col)]))[0].split('-')[-1]
-    #                 agentThread = '0' + agentThread if len(agentThread) < len(str(len(Agent.agentDict))) else agentThread
-    #                 if (row, col) == Agent.agentDict[(row, col)].target:
-    #                     # CP.print_pass('X' , end=" ")
-    #                     # CP.print_pass(f"| {agentThread} |" , end=" ")
-    #                     continue
-    #                 # CP.print_fail(f"| {agentThread} |" , end=" ")
-    #                 CP.print_fail('X' , end=" ")
-
-    #                 continue
-    #             CP.print_bold('.', end=" ")
-
-    #             # CP.print_bold(f"| {dot} |", end=" ")
-    #         print()
+    displayTime = 2     
         
+    
+    
+    def defaultConfig(self):
+        Agent.isMoving = Semaphore(1)
+        Agent.limitTime = (30*60) # 30 minutes
+        Agent.nbRow = None
+        Agent.nbCol = None
+
+        # Position of an agent
+        Agent.agentDict = {}
+        Agent.prevDict = {}
+        Agent.messageStack = []
+
+        # Stack of GRID
+        Agent.pathFolder = 'tmp'
+        Agent.pathFont = ''
+        Agent.saveGrid = True
+        Agent.gridStack = []  
+        Agent.count = 1
+        Agent.start_time = time.time()
+        Agent.update_time = time.time()
+        Agent.displayTime = 2     
+        Agent.Terminated = False
         
     def __init__(self, currentPosition, target) -> None:
         super().__init__()
@@ -58,6 +59,27 @@ class Agent(Thread):
         self.target = target
         Agent.agentDict[currentPosition] = self
         
+    def defaultConfig():
+        Agent.isMoving = Semaphore(1)
+        Agent.limitTime = (30*60) # 30 minutes
+        Agent.nbRow = None
+        Agent.nbCol = None
+
+        # Position of an agent
+        Agent.agentDict = {}
+        Agent.prevDict = {}
+        Agent.messageStack = []
+
+        # Stack of GRID
+        Agent.pathFolder = 'tmp'
+        Agent.pathFont = ''
+        Agent.saveGrid = True
+        Agent.gridStack = []  
+        Agent.count = 1
+        Agent.start_time = time.time()
+        Agent.update_time = time.time()
+        Agent.displayTime = 2
+        Agent.Terminated = False
         
     def run(self) -> None:
         while (time.time() - Agent.start_time < Agent.limitTime) and (not Agent.verifyRunning()):
@@ -82,12 +104,6 @@ class Agent(Thread):
             Agent.gridStack.insert(0, drawGrid(Agent))
             Agent.gridStack[0].save(f'{Agent.pathFolder}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{Agent.count}.png')
             print('Time to Complete: ', time.time() - Agent.start_time)
-
-    
-    def kill():
-        global running
-        running = False
-
 
 
     def verifyRunning():
