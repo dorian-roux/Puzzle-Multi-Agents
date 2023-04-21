@@ -78,28 +78,6 @@ class Agent(Thread):
                 if (col,row) not in dictInit.values():
                     lsVoid.append((col,row))
         return lsVoid
-
-    def defaultConfig(self):
-        Agent.isMoving = Semaphore(1)
-        Agent.limitTime = (30*60) # 30 minutes
-        Agent.nbRow = None
-        Agent.nbCol = None
-
-        # Position of an agent
-        Agent.agentDict = {}
-        Agent.prevDict = {}
-        Agent.messageStack = []
-
-        # Stack of GRID
-        Agent.pathFolder = 'tmp'
-        Agent.pathFont = ''
-        Agent.saveGrid = True
-        Agent.gridStack = []  
-        Agent.count = 1
-        Agent.start_time = time.time()
-        Agent.update_time = time.time()
-        Agent.displayTime = 2     
-        Agent.Terminated = False
         
     def __init__(self, currentPosition, target) -> None:
         super().__init__()
