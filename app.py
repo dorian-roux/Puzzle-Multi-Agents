@@ -102,20 +102,22 @@ def main():
         Agent.nbRow, Agent.nbCol = st.session_state['GRID']['N_ROWS'], st.session_state['GRID']['N_COLS']
         Agent.agendDict = {}
 
-        allPosition = [(r,c) for r in range(0, Agent.nbRow) for c in range(0, Agent.nbCol)]
-        allTarget = allPosition.copy()
+        allPosition = [(r,c) for r in range(0,Agent.nbRow) for c in range(0,Agent.nbCol)]
 
         MAX_AGENT = ((Agent.nbRow) * (Agent.nbCol)) - 1
         NUMBER_AGENT = int(MAX_AGENT * st.session_state['FILL_PRCT']/100)
-        for _ in range(NUMBER_AGENT):
-            init = random.choice(allPosition)
-            target = random.choice(allTarget)
-            allPosition.remove(init)
-            allTarget.remove(target)
-            Agent(init, target)
 
-        # Agent.gridStack.insert(0, drawGrid(Agent))
-        # Agent.gridStack[0].save(f'{Agent.pathFolder}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_0.png')
+        allTarget = []
+        for _ in range(NUMBER_AGENT):
+            target = random.choice(allPosition)
+            allPosition.remove(target)
+            allTarget.append(target)
+            
+        dictInit = Agent.generateInit(allTarget)
+        for target, init in dictInit.items():
+            agent = Agent(init, target)
+
+        print(dictInit)
         AgentList = list(Agent.agentDict.values())
         for agent in AgentList:
             agent.start()

@@ -28,8 +28,57 @@ class Agent(Thread):
     displayTime = 2     
     Terminated = False
 
-    
-    
+    def defaultConfig():
+        Agent.isMoving = Semaphore(1)
+        Agent.limitTime = (30*60) # 30 minutes
+        Agent.nbRow = None
+        Agent.nbCol = None
+
+        # Position of an agent
+        Agent.agentDict = {}
+        Agent.prevDict = {}
+        Agent.messageStack = []
+
+        # Stack of GRID
+        Agent.pathFolder = 'tmp'
+        Agent.pathFont = ''
+        Agent.saveGrid = True
+        Agent.gridStack = []  
+        Agent.count = 1
+        Agent.start_time = time.time()
+        Agent.update_time = time.time()
+        Agent.displayTime = 2     
+        Agent.Terminated = False
+
+    def generateInit(allTarget, numIteration=1000):
+        # Generate a random possible initial position grid based on the target coordinates list
+        i = 0
+        dictInit = {target : target for target in allTarget}
+        while i < numIteration:
+            i = i + 1
+            voids = Agent.getVoid(dictInit)
+            for void in random.sample(voids, k=len(voids)):
+                lsVoidNeighbors = []
+                for newPos in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
+                    neighborPos = (void[0] + newPos[0], void[1] + newPos[1])
+                    if neighborPos in dictInit.values():
+                        lsVoidNeighbors.append(neighborPos)
+                if len(lsVoidNeighbors) != 0:
+                    neighbor = random.choice(lsVoidNeighbors)
+                    neighborTarget = [k for k, v in dictInit.items() if v == neighbor][0]
+                    dictInit[neighborTarget] = void          
+                    break
+                continue
+        return dictInit         
+
+    def getVoid(dictInit):
+        lsVoid = []
+        for col in range(0, Agent.nbRow):
+            for row in range(0, Agent.nbCol):
+                if (col,row) not in dictInit.values():
+                    lsVoid.append((col,row))
+        return lsVoid
+
     def defaultConfig(self):
         Agent.isMoving = Semaphore(1)
         Agent.limitTime = (30*60) # 30 minutes
@@ -59,28 +108,6 @@ class Agent(Thread):
         self.currentPosition = currentPosition
         self.target = target
         Agent.agentDict[currentPosition] = self
-        
-    def defaultConfig():
-        Agent.isMoving = Semaphore(1)
-        Agent.limitTime = (30*60) # 30 minutes
-        Agent.nbRow = None
-        Agent.nbCol = None
-
-        # Position of an agent
-        Agent.agentDict = {}
-        Agent.prevDict = {}
-        Agent.messageStack = []
-
-        # Stack of GRID
-        Agent.pathFolder = 'tmp'
-        Agent.pathFont = ''
-        Agent.saveGrid = True
-        Agent.gridStack = []  
-        Agent.count = 1
-        Agent.start_time = time.time()
-        Agent.update_time = time.time()
-        Agent.displayTime = 2
-        Agent.Terminated = False
         
     def run(self) -> None:
         while (time.time() - Agent.start_time < Agent.limitTime) and (not Agent.verifyRunning()):
@@ -227,34 +254,3 @@ class Agent(Thread):
                     lsOpen.append(neighborPos)
                     dictGHF[neighborPos] = dict({'G': newG, 'H': newH, 'F': newF})
                     parent[neighborPos] = choicePos
-
-    
-
-
-
-if __name__ == '__main__':
-    Agent.nbRow = Agent.nbCol = 5
-    Agent.agendDict = {}
-
-    allPosition = [(r,c) for r in range(Agent.nbRow+1) for c in range(Agent.nbCol+1)]
-    allTarget = allPosition.copy()
-
-    MAX_AGENT = (Agent.nbRow + 1) * (Agent.nbCol + 1)
-    NUMBER_AGENT = int(MAX_AGENT*0.8)
-        
-    for _ in range(NUMBER_AGENT):
-        init = random.choice(allPosition)
-        allPosition.remove(init)
-
-        target = random.choice(allTarget)
-        allTarget.remove(target)
-
-        agent = Agent(init, target)
-
-    AgentList = list(Agent.agentDict.values())
-    # InitList = list(Agent.agentDict.keys())
-    # for init in InitList:
-    #     print("Initial State:",init, "Target State:",Agent.agentDict[init].target)
-
-    for agent in AgentList:
-        agent.start()
