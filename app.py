@@ -112,12 +112,11 @@ def main():
             target = random.choice(allPosition)
             allPosition.remove(target)
             allTarget.append(target)
-            
+
         dictInit = Agent.generateInit(allTarget)
         for target, init in dictInit.items():
             agent = Agent(init, target)
-
-        print(dictInit)
+            
         AgentList = list(Agent.agentDict.values())
         for agent in AgentList:
             agent.start()

@@ -78,28 +78,6 @@ class Agent(Thread):
                 if (col,row) not in dictInit.values():
                     lsVoid.append((col,row))
         return lsVoid
-
-    def defaultConfig(self):
-        Agent.isMoving = Semaphore(1)
-        Agent.limitTime = (30*60) # 30 minutes
-        Agent.nbRow = None
-        Agent.nbCol = None
-
-        # Position of an agent
-        Agent.agentDict = {}
-        Agent.prevDict = {}
-        Agent.messageStack = []
-
-        # Stack of GRID
-        Agent.pathFolder = 'tmp'
-        Agent.pathFont = ''
-        Agent.saveGrid = True
-        Agent.gridStack = []  
-        Agent.count = 1
-        Agent.start_time = time.time()
-        Agent.update_time = time.time()
-        Agent.displayTime = 2     
-        Agent.Terminated = False
         
     def __init__(self, currentPosition, target) -> None:
         super().__init__()
@@ -201,7 +179,7 @@ class Agent(Thread):
         for void in lsVoid:
             path_to_void = self.Astar(void)
             lsDistance.append((len(path_to_void), path_to_void))
-        return sorted(lsDistance, key=lambda x: x[0], reverse=False)[0][1]
+        return random.choice(list(filter(lambda distInf : distInf == min(lsDistance, key=lambda x: x[0]), lsDistance)))[1]
                 
     def Astar(self, targetPos): # A* algorithm
         dictGHF = dict({self.currentPosition : {'G': 0, 'H':0, 'F':0}})
@@ -225,8 +203,8 @@ class Agent(Thread):
         
             lsOpen.remove(choicePos)
             lsClosed.append(choicePos)
-                
-            for newPos in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
+            
+            for newPos in random.sample([(0, -1), (0, 1), (-1, 0), (1, 0)], k=4):
                 neighborPos = (choicePos[0] + newPos[0], choicePos[1] + newPos[1])
                 if neighborPos[0] < 0 or neighborPos[0] >= Agent.nbRow or neighborPos[1] < 0 or neighborPos[1] >= Agent.nbCol:
                     continue
