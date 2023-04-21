@@ -92,7 +92,6 @@ def main():
     
     # Step by Step
     if not st.session_state['P_IN_PROGRESS']:
-        Agent.agendDict = {}
 
         Agent.pathFont = 'src/static/fonts/georgia bold.ttf'
         if not st.session_state['PATH_FOLDER']:
@@ -104,6 +103,7 @@ def main():
     
         # Initialize the GRID information
         Agent.nbRow, Agent.nbCol = st.session_state['GRID']['N_ROWS'], st.session_state['GRID']['N_COLS']
+        Agent.agendDict = {}
 
         allPosition = [(r,c) for r in range(0,Agent.nbRow) for c in range(0,Agent.nbCol)]
         MAX_AGENT = ((Agent.nbRow) * (Agent.nbCol)) - 1
@@ -130,52 +130,48 @@ def main():
         SaveDrawnGrid(Agent.nbRow, Agent.nbCol, Agent.agentDict, Agent.pathFont, Agent.pathFolder, imCount)
         ImageInitPath = f'{st.session_state["PATH_FOLDER"]}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{imCount}.png'
        
-        try: 
-            while not isComplete:
-                time.sleep(st.session_state['DISPLAY_TIME'])
-                # Verify if the process has reached the TIME LIMIT
-                if initTime >= st.session_state['LIMIT_TIME'] * 60:
-                    isComplete = True
-                
-                # Save and Display the current GRID
-                # Agent.isMoving.acquire()
-                SaveDrawnGrid(Agent.nbRow, Agent.nbCol, Agent.agentDict, Agent.pathFont, Agent.pathFolder, imCount)
-                areaPlaceholder.empty()
-                ImagePath = f'{st.session_state["PATH_FOLDER"]}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{imCount}.png'
-                with areaPlaceholder.container():
-                    _, col1, _, col2, _ = st.columns([1, 4.5, 1, 4.5, 1])
-                    col1.markdown(f"""
-                        <div style="text-align:center">
-                            <h4 style="font-weight:bold">INITIAL GRID</h4>
-                        </div>
+        while not isComplete:
+            time.sleep(st.session_state['DISPLAY_TIME'])
+            # Verify if the process has reached the TIME LIMIT
+            if (time.time() - initTime) >= (st.session_state['LIMIT_TIME'] * 60):
+                isComplete = True
+                break
+            
+            # Save and Display the current GRID
+            # Agent.isMoving.acquire()
+            SaveDrawnGrid(Agent.nbRow, Agent.nbCol, Agent.agentDict, Agent.pathFont, Agent.pathFolder, imCount)
+            areaPlaceholder.empty()
+            ImagePath = f'{st.session_state["PATH_FOLDER"]}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{imCount}.png'
+            with areaPlaceholder.container():
+                _, col1, _, col2, _ = st.columns([1, 4.5, 1, 4.5, 1])
+                col1.markdown(f"""
+                    <div style="text-align:center">
+                        <h4 style="font-weight:bold">INITIAL GRID</h4>
+                    </div>
+                """, unsafe_allow_html=True)
+                col2.markdown(f"""
+                    <div style="text-align:center">
+                        <h4 style="font-weight:bold">GRID - N°{imCount}</h4>
+                    </div>
                     """, unsafe_allow_html=True)
-                    col2.markdown(f"""
-                        <div style="text-align:center">
-                            <h4 style="font-weight:bold">GRID - N°{imCount}</h4>
-                        </div>
-                        """, unsafe_allow_html=True)
-                    col1.image(ImageInitPath, use_column_width=True)
-                    col2.image(ImagePath, use_column_width=True)
+                col1.image(ImageInitPath, use_column_width=True)
+                col2.image(ImagePath, use_column_width=True)
 
-                imCount += 1
+            imCount += 1
 
-                # Agent.isMoving.release()
-                
-                # Verify if the process has reached is COMPLETE FORM
-                isComplete = Agent.verifyRunning()
+            # Agent.isMoving.release()
             
-            # Turn of the Running
-            for agent in AgentList:
-                agent.isRunning = False
+            # Verify if the process has reached is COMPLETE FORM
+            isComplete = Agent.verifyRunning()
+        
+        # Turn of the Running
+        for agent in AgentList:
+            agent.isRunning = False
+        
+        st.session_state['P_IN_PROGRESS'] = True
+        Agent.agentDict = {}
+        st.experimental_rerun()
             
-            st.session_state['P_IN_PROGRESS'] = True
-            Agent.agentDict = {}
-            st.experimental_rerun()
-            
-        except KeyError: 
-            st.session_state['P_IN_PROGRESS'] = True
-            Agent.agentDict = {}
-            return
             
     # Display ALL IMAGES
     

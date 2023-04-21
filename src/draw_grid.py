@@ -23,13 +23,13 @@ def SaveDrawnGrid(nbRow, nbCol, dictAgents, pathFont, pathFolder, count):
     upAgents = {agentNumb : str(agentIndex+1) for agentIndex, agentNumb in enumerate(lsAgentsNumb)}
     for r in range(0, nbRow+1):    
         for c in range(0, nbCol+1):
-            initWidth, initHeight = (limitWidth + (r/nbRow) * sizeWidth), (limitHeight + (c/nbRow) * sizeHeight)
+            initWidth, initHeight = (limitWidth + (r/nbRow) * sizeWidth), (limitHeight + (c/nbCol) * sizeHeight)
             ImDraw.line((initWidth, limitHeight, initWidth, ImGrid.height - limitHeight), fill="black", width=round(borderSize/10))  
             ImDraw.line((limitWidth, initHeight, ImGrid.width - limitWidth, initHeight), fill="black", width=round(borderSize/10))
 
 
             minWidth, maxWidth = (limitWidth + (r/nbRow) * sizeWidth), (limitWidth + ((r+1)/nbRow) * sizeWidth)
-            minHeight, maxHeight = (limitHeight + (c/nbRow) * sizeHeight), (limitHeight + ((c+1)/nbRow) * sizeHeight)
+            minHeight, maxHeight = (limitHeight + (c/nbCol) * sizeHeight), (limitHeight + ((c+1)/nbCol) * sizeHeight)
             middleWidth, middleHeight = minWidth + (maxWidth - minWidth)/2, minHeight + (maxHeight - minHeight)/2 
             if (r, c) in dictAgents:
                 content = upAgents[re.findall(r'Thread-\d+', str(dictAgents[(r, c)]))[0].split('-')[-1]]
