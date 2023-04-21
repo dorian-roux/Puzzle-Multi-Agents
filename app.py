@@ -101,9 +101,7 @@ def main():
         Agent.nbRow, Agent.nbCol = st.session_state['GRID']['N_ROWS'], st.session_state['GRID']['N_COLS']
         Agent.agendDict = {}
 
-        st.write(Agent.nbRow, Agent.nbCol)
-
-        allPosition = [(r,c) for r in range(Agent.nbRow) for c in range(Agent.nbCol)]
+        allPosition = [(r,c) for r in range(0, Agent.nbRow) for c in range(0, Agent.nbCol)]
         allTarget = allPosition.copy()
 
         MAX_AGENT = ((Agent.nbRow) * (Agent.nbCol)) - 1
@@ -114,7 +112,7 @@ def main():
             allPosition.remove(init)
             allTarget.remove(target)
             Agent(init, target)
-        
+
         # Agent.gridStack.insert(0, drawGrid(Agent))
         # Agent.gridStack[0].save(f'{Agent.pathFolder}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_0.png')
         AgentList = list(Agent.agentDict.values())
@@ -129,11 +127,11 @@ def main():
             ImagePath = f'{st.session_state["PATH_FOLDER"]}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{maxIm}.png'
             _, col1, _ = st.columns([4, 4, 4])
             col1.image(ImagePath, use_column_width=True)
+            st.write(maxIm)
             st.session_state['INDEX_IMAGE'] = maxIm
 
         except:
             pass
-        st.session_state['INDEX_IMAGE'] = maxIm
         st.experimental_rerun()
     
     

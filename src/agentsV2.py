@@ -84,7 +84,6 @@ class Agent(Thread):
         
     def run(self) -> None:
         while (time.time() - Agent.start_time < Agent.limitTime) and (not Agent.verifyRunning()):
-            
             Agent.isMoving.acquire()
             self.move()
             Agent.isMoving.release()
@@ -133,9 +132,6 @@ class Agent(Thread):
             if len(Agent.messageStack) == 1:
                 closestPos = self.Astar(self.target)[1]
                 if closestPos not in Agent.agentDict:
-                    # print(self.currentPosition, self.target, closestPos)
-                    # print( Agent.agentDict)
-                    # print(closestPos in Agent.agentDict)
                     Agent.agentDict.pop(self.currentPosition)
                     self.currentPosition = closestPos
                     Agent.agentDict[self.currentPosition] = self
@@ -157,7 +153,10 @@ class Agent(Thread):
         else:
             # The thread is not the master 
             if Agent.messageStack[-1].receiver == self:
-                # The thread is the receiver, we change the position of the agent to the new position
+                # print(Agent.messageStack[-1].receiver, self, Agent.messageStack[-1].position)
+                # print(Agent.messageStack[-1].position, self.currentPosition)
+                # print('----------------------')
+                # # The thread is the receiver, we change the position of the agent to the new position
                 Agent.agentDict.pop(self.currentPosition)
                 self.currentPosition = Agent.messageStack[-1].position
                 Agent.agentDict[self.currentPosition] = self
@@ -168,8 +167,8 @@ class Agent(Thread):
 
     def getClosestVoid(self):
         lsVoid = []
-        for col in range(Agent.nbRow+1):
-            for row in range(Agent.nbCol+1):
+        for col in range(0, Agent.nbRow):
+            for row in range(0, Agent.nbCol):
                 if (col,row) not in Agent.agentDict:
                     lsVoid.append((col,row))
         
@@ -204,11 +203,11 @@ class Agent(Thread):
                 
             for newPos in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
                 neighborPos = (choicePos[0] + newPos[0], choicePos[1] + newPos[1])
-                if neighborPos[0] < 0 or neighborPos[0] > Agent.nbRow or neighborPos[1] < 0 or neighborPos[1] > Agent.nbCol:
+                if neighborPos[0] < 0 or neighborPos[0] >= Agent.nbRow or neighborPos[1] < 0 or neighborPos[1] >= Agent.nbCol:
                     continue
                 if neighborPos in lsClosed:
                     continue
-                if neighborPos not in Agent.agentDict:
+                if neighborPos not in   Agent.agentDict:
                     newG = dictGHF[choicePos]['G'] + 1
                     newH = abs(neighborPos[0] - targetPos[0]) + abs(neighborPos[1] - targetPos[1])
                     newF = newG + newH

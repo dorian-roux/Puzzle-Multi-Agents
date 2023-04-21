@@ -18,6 +18,10 @@ def drawGrid(Agent):
     ImDraw.rectangle((limitWidth, limitHeight, ImGrid.width - limitWidth, ImGrid.height - limitHeight), fill="white", outline="black", width=round(borderSize/10))
     sizeWidth = (ImGrid.width - (2 * limitWidth))   
     sizeHeight = (ImGrid.height - (2 * limitHeight))
+    
+    lsAgentsDone = []
+    lsAgentsNumb = sorted(list(map(lambda agentPos : str(re.findall(r'Thread-\d+', str(Agent.agentDict[agentPos]))[0].split('-')[-1]), Agent.agentDict.keys())), reverse=False)
+    dictAgents = {agentNumb : str(agentIndex+1) for agentIndex, agentNumb in enumerate(lsAgentsNumb)}
     for r in range(0, nbRow+1):    
         for c in range(0, nbCol+1):
             initWidth, initHeight = (limitWidth + (r/nbRow) * sizeWidth), (limitHeight + (c/nbRow) * sizeHeight)
@@ -29,8 +33,9 @@ def drawGrid(Agent):
             minHeight, maxHeight = (limitHeight + (c/nbRow) * sizeHeight), (limitHeight + ((c+1)/nbRow) * sizeHeight)
             middleWidth, middleHeight = minWidth + (maxWidth - minWidth)/2, minHeight + (maxHeight - minHeight)/2 
             content, fill = "", (255,255,255)
-            if (r, c) in Agent.agentDict: 
-                content = re.findall(r'Thread-\d+', str(Agent.agentDict[(r, c)]))[0].split('-')[-1]
+            if (r, c) in Agent.agentDict and (r,c) not in lsAgentsDone: 
+                lsAgentsDone.append((r, c))
+                content = dictAgents[re.findall(r'Thread-\d+', str(Agent.agentDict[(r, c)]))[0].split('-')[-1]]
                 fill = "green" if Agent.agentDict[(r, c)].target == (r, c) else "red"
             font = ImageFont.FreeTypeFont(Agent.pathFont,25)
             textBox = ImDraw.textbbox((0,0), content, font=font)
