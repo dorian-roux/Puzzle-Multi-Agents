@@ -26,7 +26,8 @@ class Agent(Thread):
     start_time = time.time()
     update_time = time.time()
     displayTime = 2     
-        
+    Terminated = False
+
     
     
     def defaultConfig(self):
