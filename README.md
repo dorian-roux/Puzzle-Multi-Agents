@@ -9,7 +9,7 @@ This is a project developped during the Module of **Opening** from the Engineer 
 
 ## Available Deployment
 
-The interface is hosted through Streamlit. It is available at the following [Link](https://dorian-roux-clip-case-study-app-c97l2x.streamlit.app/).
+The interface is hosted through Streamlit. It is available at the following [Link](https://dorian-roux-ing3-ouverture-ia-app-oq0zfc.streamlit.app/).
 
 Due to the lack of time, we could not make the most suitable interface regarding the project, however, we tried to make it as user-friendly as possible while being able to display answers to the multi-agents problematic.
 
