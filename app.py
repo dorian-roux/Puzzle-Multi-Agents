@@ -9,6 +9,7 @@
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+sys.setrecursionlimit(1500)
 
 # -- General Libraries --
 import time
@@ -127,23 +128,12 @@ def main():
             ImagePath = f'{st.session_state["PATH_FOLDER"]}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{maxIm}.png'
             _, col1, _ = st.columns([4, 4, 4])
             col1.image(ImagePath, use_column_width=True)
-            st.write(maxIm)
-            st.session_state['INDEX_IMAGE'] = maxIm
-
         except:
             pass
         st.experimental_rerun()
+       
     
-    
-    if not st.session_state['FAST_VALIDATE']:
-        time.sleep(1) 
-        st.session_state['FAST_VALIDATE'] = True
-        # maxIm = max(list(map(lambda fileIm : int(fileIm.split('-Im_')[-1].split('.')[0]), os.listdir(st.session_state["PATH_FOLDER"]))))
-        # ImagePath = f'{st.session_state["PATH_FOLDER"]}/PuzzleMA-{st.session_state["GRID"]["N_ROWS"]}_{st.session_state["GRID"]["N_COLS"]}-Im_{maxIm}.png'
-        st.experimental_rerun()
-    
-    
-    # # Display ALL IMAGES    
+    # Display ALL IMAGES    
     st.write('<hr>', unsafe_allow_html=True)
     st.write('<br>', unsafe_allow_html=True)
     st.subheader('Display the Puzzle Multi-Agents')
@@ -157,8 +147,13 @@ def main():
                     <h2 style="font-weight:bold">IMAGE {st.session_state['INDEX_IMAGE']}</h2>
                   </div>
                   """, unsafe_allow_html=True)
-    col1.image(ImagePath, use_column_width=True)
-  
+    try:
+        ImagePath = f'{st.session_state["PATH_FOLDER"]}/PuzzleMA-{st.session_state["GRID"]["N_ROWS"]}_{st.session_state["GRID"]["N_COLS"]}-Im_{st.session_state["INDEX_IMAGE"]}.png'
+        col1.image(ImagePath, use_column_width=True)
+    except:
+        ImagePath = f'{st.session_state["PATH_FOLDER"]}/PuzzleMA-{st.session_state["GRID"]["N_ROWS"]}_{st.session_state["GRID"]["N_COLS"]}-Im_{st.session_state["LIST_IMAGES"][-2]}.png'
+        col1.image(ImagePath, use_column_width=True)
+
   
     if st.button('reconfigure'):
         st.session_state['config'] = False

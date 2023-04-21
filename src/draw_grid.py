@@ -32,14 +32,19 @@ def drawGrid(Agent):
             minWidth, maxWidth = (limitWidth + (r/nbRow) * sizeWidth), (limitWidth + ((r+1)/nbRow) * sizeWidth)
             minHeight, maxHeight = (limitHeight + (c/nbRow) * sizeHeight), (limitHeight + ((c+1)/nbRow) * sizeHeight)
             middleWidth, middleHeight = minWidth + (maxWidth - minWidth)/2, minHeight + (maxHeight - minHeight)/2 
-            content, fill = "", (255,255,255)
-            if (r, c) in Agent.agentDict and (r,c) not in lsAgentsDone: 
-                lsAgentsDone.append((r, c))
+            if (r, c) in Agent.agentDict:
                 content = dictAgents[re.findall(r'Thread-\d+', str(Agent.agentDict[(r, c)]))[0].split('-')[-1]]
+                if content in lsAgentsDone:
+                    continue
+                lsAgentsDone.append(content)
                 fill = "green" if Agent.agentDict[(r, c)].target == (r, c) else "red"
-            font = ImageFont.FreeTypeFont(Agent.pathFont,25)
-            textBox = ImDraw.textbbox((0,0), content, font=font)
-            textWidth, textHeight = textBox[2] - textBox[0],  textBox[3]
-            ImDraw.text((middleWidth - textWidth/2, middleHeight - textHeight/2), content, fill=fill, font=ImageFont.FreeTypeFont(Agent.pathFont, 25))            
+                font = ImageFont.FreeTypeFont(Agent.pathFont,25)
+                textBox = ImDraw.textbbox((0,0), content, font=font)
+                textWidth, textHeight = textBox[2] - textBox[0],  textBox[3]
+                ImDraw.text((middleWidth - textWidth/2, middleHeight - textHeight/2), content, fill=fill, font=ImageFont.FreeTypeFont(Agent.pathFont, 25))   
+                
+                
+    if len(lsAgentsDone) == len(Agent.agentDict):
+       ImGrid.save(f'{Agent.pathFolder}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{Agent.count}.png')
     return ImGrid
 

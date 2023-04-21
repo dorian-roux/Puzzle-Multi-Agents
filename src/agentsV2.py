@@ -94,7 +94,6 @@ class Agent(Thread):
                     if Agent.prevDict != Agent.agentDict:
                         Agent.prevDict = Agent.agentDict.copy()
                         Agent.gridStack.insert(0, drawGrid(Agent))
-                        Agent.gridStack[0].save(f'{Agent.pathFolder}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{Agent.count}.png')
                         Agent.count = Agent.count + 1
                     Agent.update_time = time.time()
                     
@@ -102,7 +101,6 @@ class Agent(Thread):
         if not Agent.Terminated:
             Agent.Terminated = True
             Agent.gridStack.insert(0, drawGrid(Agent))
-            Agent.gridStack[0].save(f'{Agent.pathFolder}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{Agent.count}.png')
             print('Time to Complete: ', time.time() - Agent.start_time)
 
 
