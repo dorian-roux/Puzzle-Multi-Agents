@@ -42,8 +42,8 @@ def SaveDrawnGrid(nbRow, nbCol, dictAgents, pathFont, pathFolder, count):
                 textWidth, textHeight = textBox[2] - textBox[0],  textBox[3]
                 ImDraw.text((middleWidth - textWidth/2, middleHeight - textHeight/2), content, fill=fill, font=ImageFont.FreeTypeFont(pathFont, size=25))   
                 
-    # if len(lsAgentsDone) == len(upAgents):
-    ImGrid.save(f'{pathFolder}/PuzzleMA-{nbRow}_{nbCol}-Im_{count}.png')
-    
-    return True
+    if len(lsAgentsDone) == len(upAgents):
+        ImGrid.save(f'{pathFolder}/PuzzleMA-{nbRow}_{nbCol}-Im_{count}.png')
+        return True 
+    return False
 

@@ -7,7 +7,7 @@ from message import Message
 class Agent(Thread):
     
     isMoving = Semaphore(1)
-    imitTime = (30*60) # 30 minutes
+    imitTime = (2*60) # 2 minutes
     nbRow = None
     nbCol = None
 
@@ -15,39 +15,9 @@ class Agent(Thread):
     agentDict = {}
     prevDict = {}
     messageStack = []
-
-    # Stack of GRID
-    pathFolder = 'tmp'
-    pathFont = ''
-    saveGrid = True
-    gridStack = []  
-
-   
-
-
-    # def defaultConfig():
-    #     Agent.isMoving = Semaphore(1)
-    #     Agent.limitTime = (30*60) # 30 minutes
-    #     Agent.nbRow = None
-    #     Agent.nbCol = None
-
-    #     # Position of an agent
-    #     Agent.agentDict = {}
-    #     Agent.prevDict = {}
-    #     Agent.messageStack = []
-
-    #     # Stack of GRID
-    #     Agent.pathFolder = 'tmp'
-    #     Agent.pathFont = ''
-    #     Agent.saveGrid = False
-    #     Agent.gridStack = []  
-    #     Agent.count = 1
-    #     Agent.start_time = time.time()
-    #     Agent.update_time = time.time()
-    #     Agent.displayTime = 2     
-    #     Agent.Terminated = False
-
-    def generateInit(allTarget, numIteration=1000):
+  
+  
+    def generateInit(allTarget, numIteration=10000):
         # Generate a random possible initial position grid based on the target coordinates list
         i = 0
         dictInit = {target : target for target in allTarget}
@@ -107,7 +77,6 @@ class Agent(Thread):
             return 
 
         # The stack is not empty we need to check if the thread is the master
-        # print(Agent.messageStack[0].sender, self)
         if Agent.messageStack[0].sender == self:
             # The thread is the master
             
@@ -127,7 +96,6 @@ class Agent(Thread):
                 else:          
                     # The master send a message to the closest agent on the best path to move
                     closestPos_path = Agent.agentDict[closestPos].getClosestVoid()
-                    # print((self.currentPosition, self.target), closestPos, closestPos_path)
                     Agent.messageStack.append(Message(self, Agent.agentDict[closestPos_path[0]], closestPos_path[1]))
                     for i in range(len(closestPos_path[:-2])):
                         if closestPos_path[i+1] not in Agent.agentDict:
