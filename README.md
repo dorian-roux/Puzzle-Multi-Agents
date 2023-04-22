@@ -7,7 +7,7 @@ This is a project developped during the Module of **Opening** from the Engineer 
 </br>
 
 ## Project Demonstration
-<img src="src/static/gif/Demonstration.gif"/>
+![](https://github.com/dorian-roux/ing3-ouverture-ia/blob/master/src/static/gif/Demonstration.gif)
 </br>
 
 
