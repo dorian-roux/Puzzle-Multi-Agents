@@ -114,47 +114,50 @@ def main():
         SaveDrawnGrid(Agent.nbRow, Agent.nbCol, Agent.agentDict, st.session_state['PATH_FONT'], st.session_state['PATH_FOLDER'], imCount)
         st.session_state['PATH_INIT_IM'] = f'{st.session_state["PATH_FOLDER"]}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{imCount}.png'
         imCount += 1
-        while not isComplete:
-            time.sleep(st.session_state['DISPLAY_TIME'])
-            if (time.time() - initTime) >= (st.session_state['LIMIT_TIME'] * 60):
-                isComplete = True
-            
-            if SaveDrawnGrid(Agent.nbRow, Agent.nbCol, Agent.agentDict, st.session_state['PATH_FONT'], st.session_state['PATH_FOLDER'], imCount) == True:
-                imCount+=1
+        try:
+            while not isComplete:
+                time.sleep(st.session_state['DISPLAY_TIME'])
+                if (time.time() - initTime) >= (st.session_state['LIMIT_TIME'] * 60):
+                    isComplete = True
+                
+                if SaveDrawnGrid(Agent.nbRow, Agent.nbCol, Agent.agentDict, st.session_state['PATH_FONT'], st.session_state['PATH_FOLDER'], imCount) == True:
+                    imCount+=1
 
-            areaPlaceholder.empty()
-            st.session_state['PATH_SLCT_IM'] = f'{st.session_state["PATH_FOLDER"]}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{imCount-1}.png'
-            with areaPlaceholder.container():
-                st.markdown("""
-                <div style="text-align:center; margin-top:10px; margin-bottom:10px">
-                    <h3 style="font-size:30px; font-family: monospace; margin-bottom:10px">Phase 2 - Puzzle Resolution</h3>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                st.markdown("""<hr style="margin-top:20px; margin-bottom:20px; width:33%; margin: auto; border: 1px dashed black; border-radius:25px"> """, unsafe_allow_html=True)
-        
-                st.markdown(f"""
-                <div style="text-align:center; margin-top:10px; margin-bottom:10px">
-                    <h3 style="font-size:20px; font-family: monospace; margin-bottom:10px">Process in Progress... (since {round(time.time() - initTime)}s)</h3>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                _, col1, _, col2, _ = st.columns([2, 3.5, 1, 3.5, 2])
-                col1.markdown(f"""
-                    <div style="text-align:center; margin-top:10px; margin-bottom:-20px">
-                        <h3 style="font-size:20px; font-family: monospace">Puzzle - <span style="color:red">DEFAULT</span></h3>
+                areaPlaceholder.empty()
+                st.session_state['PATH_SLCT_IM'] = f'{st.session_state["PATH_FOLDER"]}/PuzzleMA-{Agent.nbRow}_{Agent.nbCol}-Im_{imCount-1}.png'
+                with areaPlaceholder.container():
+                    st.markdown("""
+                    <div style="text-align:center; margin-top:10px; margin-bottom:10px">
+                        <h3 style="font-size:30px; font-family: monospace; margin-bottom:10px">Phase 2 - Puzzle Resolution</h3>
                     </div>
                     """, unsafe_allow_html=True)
-                col2.markdown(f"""
-                    <div style="text-align:center; margin-top:10px; margin-bottom:-20px">
-                        <h3 style="font-size:20px; font-family: monospace">Puzzle - <span style="color:red">STEP {imCount}</span></h3>
-                    </div>
-                    """, unsafe_allow_html=True)                    
-                col1.image(st.session_state['PATH_INIT_IM'], use_column_width=True)
-                col2.image(st.session_state['PATH_SLCT_IM'], use_column_width=True)
+                    
+                    st.markdown("""<hr style="margin-top:20px; margin-bottom:20px; width:33%; margin: auto; border: 1px dashed black; border-radius:25px"> """, unsafe_allow_html=True)
             
-            isComplete = Agent.verifyRunning()
-        
+                    st.markdown(f"""
+                    <div style="text-align:center; margin-top:10px; margin-bottom:10px">
+                        <h3 style="font-size:20px; font-family: monospace; margin-bottom:10px">Process in Progress... (since {round(time.time() - initTime)}s)</h3>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    _, col1, _, col2, _ = st.columns([2, 3.5, 1, 3.5, 2])
+                    col1.markdown(f"""
+                        <div style="text-align:center; margin-top:10px; margin-bottom:-20px">
+                            <h3 style="font-size:20px; font-family: monospace">Puzzle - <span style="color:red">DEFAULT</span></h3>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    col2.markdown(f"""
+                        <div style="text-align:center; margin-top:10px; margin-bottom:-20px">
+                            <h3 style="font-size:20px; font-family: monospace">Puzzle - <span style="color:red">STEP {imCount}</span></h3>
+                        </div>
+                        """, unsafe_allow_html=True)                    
+                    col1.image(st.session_state['PATH_INIT_IM'], use_column_width=True)
+                    col2.image(st.session_state['PATH_SLCT_IM'], use_column_width=True)
+                
+                isComplete = Agent.verifyRunning()
+        except KeyError:        
+            return 
+            
         SaveDrawnGrid(Agent.nbRow, Agent.nbCol, Agent.agentDict, st.session_state['PATH_FONT'], st.session_state['PATH_FOLDER'], imCount)
         # Turn of the Running
         for agent in AgentList:
