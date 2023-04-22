@@ -7,7 +7,7 @@ This is a project developped during the Module of **Opening** from the Engineer 
 </br>
 
 ## Project Demonstration
-<img src="./src/static/gif/Demonstration.gif"/>
+<img src="src/static/gif/Demonstration.gif"/>
 </br>
 
 
