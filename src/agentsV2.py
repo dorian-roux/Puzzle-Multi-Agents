@@ -105,7 +105,8 @@ class Agent(Thread):
         else:
             # The thread is not the master 
             if Agent.messageStack[-1].receiver == self:
-                Agent.agentDict.pop(self.currentPosition)
+                if self.currentPosition in Agent.agentDict:
+                    Agent.agentDict.pop(self.currentPosition)
                 self.currentPosition = Agent.messageStack[-1].position
                 Agent.agentDict[self.currentPosition] = self
                 Agent.messageStack.pop()
