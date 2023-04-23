@@ -45,7 +45,14 @@ class Agent(Thread):
                 if (col,row) not in dictInit.values():
                     lsVoid.append((col,row))
         return lsVoid
-        
+     
+    def verifyRunning():
+        for agent in Agent.agentDict.values():
+            if agent.currentPosition != agent.target:
+                return False
+        return True
+    
+       
     def __init__(self, currentPosition, target) -> None:
         super().__init__()
         self.running = True
@@ -61,13 +68,6 @@ class Agent(Thread):
             self.move()
             Agent.isMoving.release()
             time.sleep(0.01)
-
-
-    def verifyRunning():
-        for agent in Agent.agentDict.values():
-            if agent.currentPosition != agent.target:
-                return False
-        return True
 
 
     def move(self):
