@@ -1,15 +1,15 @@
 from PIL import Image, ImageDraw, ImageFont
 import re
 
-def setupImageGrid(nbRow, nbCol):
+def setupImageBoard(nbRow, nbCol):
     borderSize = max(nbRow, nbCol)
     ImGrid = Image.new(size=((nbRow*100) + borderSize, (nbCol*100) + borderSize), mode='RGB', color=(0,0,0,0))
     ImDraw = ImageDraw.Draw(ImGrid)
     ImDraw.rounded_rectangle((0, 0, ImGrid.width, ImGrid.height), fill="white", outline="black", width=borderSize, radius=15)
     return ImGrid
 
-def SaveDrawnGrid(nbRow, nbCol, dictAgents, pathFont, pathFolder, count):
-    ImGrid = setupImageGrid(nbRow, nbCol)
+def SaveDrawnBoard(nbRow, nbCol, dictAgents, pathFont, pathFolder, count):
+    ImGrid = setupImageBoard(nbRow, nbCol)
     borderSize = max(nbRow, nbCol)
 
     limitWidth, limitHeight = ImGrid.width * 0.05, ImGrid.height * 0.05
