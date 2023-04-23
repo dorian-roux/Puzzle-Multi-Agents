@@ -76,7 +76,9 @@ The puzzle we developed is not perfect and can be improved in some ways. A great
 
 Also, we didnt not fixed every existing patterns that would make the puzzle impossible to solve. For instance, we sometime face the following issue where an agent is pushing another agent to reach a position and then, the agent is pushed back by the other agent trying to re-reach his final position.  
 <p align="center">
-    <img src="./src/static/gif/Bug_Board.gif" style="width:30%"/>
+    <a href="https://dorian-roux-puzzle-multi-agents-app-oec2z6.streamlit.app">
+        <img src="./src/static/gif/Bug_Board.gif" style="width:30%"/>
+    </a>
 </p>
 
 Finally, the interface is not the most suitable for this project but it was the most convenient to propose a visible interface within a short amount of time. Thus, there exists some **bugs** because of Streamlit that we were not able to handle but that may be fixed.
@@ -88,7 +90,7 @@ Finally, the interface is not the most suitable for this project but it was the 
 
 ### Online Deployment
 
-The interface is hosted through Streamlit. It is available at the following [Link](https://dorian-roux-ing3-ouverture-ia-app-oq0zfc.streamlit.app/).
+The interface is hosted through Streamlit. It is available at the following [Link](https://dorian-roux-puzzle-multi-agents-app-oec2z6.streamlit.app/).
 
 Due to the lack of time, we could not make the most suitable interface regarding the project, however, we tried to make it as user-friendly as possible while being able to display answers to the multi-agents problematic.
 
