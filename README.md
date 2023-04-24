@@ -103,7 +103,7 @@ The local deployment is based on Docker. Thus, to correctly launch our interface
 #### **1° - Clone the Repository**
 Firstly, you must clone this reposity. To do so, you can use the following command.
 ```bash
-git clone https://github.com/dorian-roux/ing3-ouverture-ia
+git clone https://github.com/dorian-roux/Puzzle-Multi-Agents
 ```
 
 #### **2° - Build the Docker Image**
