@@ -48,7 +48,15 @@ The structure of this repository is described below. It contains the source code
 
 ### Introduction
 
+The goal of this project is to develop a multi-agent system whose role is to reconstruct a puzzle according to the cognitive approach. This puzzle is inspired by the 15-puzzle game or in French, [Taquin](https://en.wikipedia.org/wiki/15_puzzle). In the game of Taquin, the objective is to move "squares" or agents in order to arrange them in an increasing order, according to their number, starting from the top left. Our context allows a more general approach with positions to be reached for each agent. Moreover, the concentration of empty squares the puzzle can be modified, which is not the case in the original Taquin game which has only one empty square available.
+
+In order to solve our multi-agent system, each agent must have reached its target position. An agent can make moves based on its perception of the occupation of neighboring squares. We started by using simple strategies in which agents directly choose to move if the path to their target is free. This approach is limited when the concentration of the system in agents is high or even maximal. Thus, we explored more sophisticated strategies in which agents interact with their neighbors before moving. Therefore, a model of interaction and message exchange between agents has been implemented.
+
 ### Agents and Communication
+
+The agents of our system are daughter classes of the `Thread` class and each piece of the game is an agent. We initialize a `Semaphore`, positive, in order to coordinate the agents. Once the threads are started, each agent will try to move by going in the queue of the semaphore.
+
+Once an agent tries to move, it queries the message `Stack` from the `Message` class. If it is empty, it will position itself as a "master" and try to reach its target. If it is already on its target, it releases the semaphore and resets the message stack. In the other case, it will search for the most efficient path to reach its target using the A* algorithm [Hart et al. (1968)](https://doi.org/10.1109/tssc.1968.300136). The first neighbor of this ideal path that will have to move will cause the generation of a message from the master agent to this "slave" agent. This slave agent will have the objective of searching for the empty square with the lowest Manhattan distance. The path between the slave agent and this empty box will result in a series of messages being sent which will be added to our message stack. These messages are the moves to be assigned to "move up" the empty box to the slave agent and allow the master agent to make its move freely to its target. The system will wait for the agent to be moved from the message at the top of the stack, retrieve the semaphore and carry out its order. At each accomplished order from the message stack, the instruction will be removed from the stack in order to make the next move.
 
 ### Board
 
